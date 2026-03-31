@@ -2,8 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const fs = require('fs');
-const path = require('path'); // <-- Declared exactly ONCE here
+const path = require('path');
 const connectDB = require('./config/db');
+const { startCronJobs } = require('./cronJobs');
 
 // Load environment variables
 dotenv.config();
@@ -25,13 +26,17 @@ app.use('/uploads', express.static(uploadsDir));
 // 3. Database Connection
 connectDB();
 
-// 4. Mount Routes
+// 4. Start Cron Jobs
+startCronJobs();
+
+// 5. Mount Routes
 const authRoutes = require('./routes/authRoutes');
 const documentRoutes = require('./routes/documentRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const cronRoutes = require('./routes/cronRoutes');
 
 app.use('/api', authRoutes);
 app.use('/api/documents', documentRoutes);
@@ -39,6 +44,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/cron', cronRoutes);
 
 // 5. Start Server
 const PORT = process.env.PORT || 5050;
