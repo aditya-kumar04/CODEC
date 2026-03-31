@@ -1,16 +1,26 @@
 {
-  "buildCommand": "cd client && npm run build",
-  "outputDirectory": "client/dist",
-  "installCommand": "cd client && npm install && cd ../server && npm install",
-  "framework": null,
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     },
     {
-      "source": "/(.*)",
-      "destination": "/client/index.html"
+      "src": "api/health.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/health",
+      "dest": "/api/health.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/$1"
     }
   ]
 }

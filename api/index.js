@@ -3,7 +3,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
-const connectDB = require('../server/config/db');
 
 // Load environment variables
 dotenv.config();
@@ -15,7 +14,7 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static file serving for uploads
+// Static file serving for uploads (Vercel doesn't support persistent storage, but we'll keep the structure)
 const uploadsDir = path.join(__dirname, '../server/uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
@@ -23,7 +22,13 @@ if (!fs.existsSync(uploadsDir)) {
 app.use('/uploads', express.static(uploadsDir));
 
 // Database Connection
-connectDB();
+let connectDB;
+try {
+  connectDB = require('../server/config/db');
+  connectDB();
+} catch (error) {
+  console.log('Database connection failed in serverless environment');
+}
 
 // Import routes
 const authRoutes = require('../server/routes/authRoutes');
